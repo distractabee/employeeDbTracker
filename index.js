@@ -1,5 +1,6 @@
 //import stuff + require inquirer
 const inquirer = require('inquirer');
+const { default: ListPrompt } = require('inquirer/lib/prompts/list');
 const mysql = require("mysql2");
 const connection = mysql.createConnection({
     host: "localhost",
@@ -49,10 +50,10 @@ function promptUser() {
                 viewRoles()
                 break;
             case "Add A Department":
-                console.log("this case");
+                addDepartment()
                 break;
             case "Add A Role":
-                console.log("this case");
+                createRole()
                 break;
             case "Add An Employee":
                 console.log("this case");
@@ -97,6 +98,66 @@ function viewRoles() {
         });
     };
 
-function addDepartment( {
-    
-})
+function addDepartment() {
+    inquirer.prompt([
+        {
+            name: "createDept",
+            type: "input",
+            message: "What is the name of the new department?"
+        }
+    ]).then(answer => {
+        const sql = `INSERT INTO department (name)
+        VALUES (?)`;
+        connection.query(sql, answer.createDept, (err, result) => {
+            if (err) throw err;
+            console.log("added new department" + answer.createDept + " to departments");
+            viewDepartments()
+        })
+    })
+};
+
+function createRole() {
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "addRole",
+            message: "What is the new role?"
+        },
+        {
+            type: "input",
+            name: "addSalary",
+            message: "What is the salary of the new role?"
+        }
+    ])
+    .then(answer => {
+        const params = [answer.addRole, answer.addSalary];
+        const roleSql = `SELECT name, id FROM department`;
+
+        connection.query(roleSql, (err, data) => {
+            if (err) throw err;
+            const deptList = data.map(({name, id}) => ({name: name, value: id }));
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    name: "chooseDept",
+                    message: "Which department is the new role part of?",
+                    choices: deptList
+                }
+            ])
+            .then(deptChoice => {
+                const dept = deptChoice.chooseDept
+                params.push(dept);
+                console.log(dept)
+                const sql = `INSERT INTO role (title, salary, department_id)
+                VALUES (?, ?, ?)`;
+
+                connection.query(sql, params, (err, result) => {
+                    if (err) throw err;
+                    console.log("Added " + answer.role + " to role list!");
+                    viewRoles();
+                });
+            });
+        });
+    });
+}
