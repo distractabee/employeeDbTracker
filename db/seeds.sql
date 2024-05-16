@@ -1,3 +1,5 @@
+use employees;
+
 INSERT INTO department (name)
 VALUES ("Maintenance"),
        ("Operations"),
@@ -7,7 +9,7 @@ VALUES ("Maintenance"),
 INSERT INTO role (title, salary, department_id)
 VALUES ("mechanic", 60000, 0),
        ("parts clerk", 36000, 0),
-       ("shop manager", 80000, 0)
+       ("shop manager", 80000, 0),
        ("operator", 40000, 1),
        ("operations manager", 65000, 1),
        ("custodian", 36000, 2),

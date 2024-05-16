@@ -1,6 +1,18 @@
 //import stuff + require inquirer
 const inquirer = require('inquirer');
-const connection = require('./db/connection');
+const mysql = require("mysql2");
+const connection = mysql.createConnection({
+    host: "localhost",
+    user: "root",
+    password: "password",
+    database: "employees"
+});
+
+connection.connect(function (err) {
+    if (err) throw err;
+    console.log("Connected as ID" + connection.threadId)
+    promptUser();
+});
 
 
 // prompt: view all departments, employees, roles,
@@ -20,15 +32,36 @@ function promptUser() {
                 "Add A Department",
                 "Add A Role",
                 "Add An Employee",
-                "Update A Role",
                 "Update An Employee Role",
             ]
         }
 
     ])
-    .then((answer) =>
-        switch(answer.choice)
-    )
+    .then(answer => {
+        switch (answer.choice) {
+            case "View All Departments":
+                viewDepartments();
+                break;
+            case "View All Employees":
+                viewEmployees()
+                break;
+            case "View All Roles":
+                viewRoles()
+                break;
+            case "Add A Department":
+                console.log("this case");
+                break;
+            case "Add A Role":
+                console.log("this case");
+                break;
+            case "Add An Employee":
+                console.log("this case");
+                break;            
+            case "Update An Employee Role":
+                console.log("this case");
+                break;
+        }
+    })
 }
 
 // functions: view departments, view employees, view roles
@@ -37,7 +70,33 @@ function promptUser() {
 // function: end prompt
 
 function viewDepartments() {
-    connection.query
-}
+    const sql = `SELECT department.id, department.name FROM department`
+    connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        promptUser();
+        });
+    };
 
-promptUser();
+function viewEmployees() {
+    const sql = `SELECT employee.first_name, employee.last_name, employee.role_id, employee.manager_id FROM employee`
+    connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        promptUser();
+        });
+    };
+
+
+function viewRoles() {
+    const sql = `SELECT role.title, role.salary, role.department_id FROM role`
+    connection.query(sql, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        promptUser();
+        });
+    };
+
+function addDepartment( {
+    
+})
